@@ -1,0 +1,219 @@
+---
+title: "Advert success analysis"
+author: "Simon waweru"
+date: "2020 30 10"
+output:
+  pdf_document: 
+    number_sections: yes
+    toc: yes
+  word_document: default
+editor_options: 
+  chunk_output_type: inline
+---
+instal.pa
+1. UNDERSTANDING THE CONTEXT
+
+A Kenyan entrepreneur has created an online cryptography course and would want to advertise it on her blog. She currently targets audiences originating from various countries. In the past, she ran ads to advertise a related course on the same blog and collected data in the process. She would now like to  identify which individuals are most likely to click on her ads. 
+
+2. METRIC OF SUCCESS
+
+our main objective is to  analyse the data and gain insights: 
+ > Who are clicking the add
+ > The Average time spent on the website
+ > Which country clicked the add most
+ > The age that  visit the add most.
+ 
+3. RECORDING EXPERIMENT DESIGH
+
+To conduct the analysis successfully , the following steps will be followed:
+
+>Loading the dataset
+
+>Data understanding
+
+>Data cleaning and manipulation
+
+>Exploratory Data analysis
+
+>Recommendations
+ 
+ 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+4. IMPORT DATA.
+
+```{r,include=TRUE}
+library(data.table)
+data2<-fread('http://bit.ly/IPAdvertisingData')
+
+```
+
+5. DATA UNDERSTANDING
+
+```{r}
+#### viewing the data
+View(data2)
+```
+```{r}
+### the data structure of the data
+str(data2)
+```
+```{r}
+### the glimpse of the data
+library(tidyverse)
+glimpse(data2)
+```
+
+6. DATA CLEANING AND MANIPULATION
+
+     1. Handling Outliers
+```{R}
+#### LOOKIING FOR OUTLIERS
+## Age
+boxplot.stats(data2$Age)
+```
+From above the stats shows the minimum age which is 19, the 25th percentile which is 29, 35 which is the median 42, the 
+75th percentile which is 42 and 61 which was the maximum.
+n shows the number of non-NA
+and out the value of extremes or outliers. 
+Hence age have 0 outliers.
+
+```{r echo=TRUE}
+### MALE
+boxplot.stats(data2$`Daily Internet Usage`)
+```
+no outliers
+```{r echo=TRUE}
+###click the ad
+boxplot.stats(data2$`Daily Time Spent on Site`)
+```
+Zero outliers
+
+     2. Handing Missing Data
+
+```{r, echo=TRUE, r,include=TRUE}
+## looking for null values
+
+colSums(is.na(data2))
+```
+We have no missing values
+
+      3. Handling missing
+```{r echo=TRUE}
+data2[duplicated(data2)]
+```
+The data have no duplicates
+
+```{r echo=TRUE}
+head(data2)
+```
+
+7. EXPLORATORY DATA ANALYSIS.
+
+    1. Bivariate data analysis
+```{r echo=TRUE}
+##  the descriptive statistics summary of age and income
+clicked=data2 %>%
+  filter(`Clicked on Ad`==1)
+summary(clicked$Age)
+summary(clicked$`Area Income`)
+summary(clicked$`Daily Time Spent on Site`)
+summary(clicked$`Daily Internet Usage`)
+```
+We have a mean age 40 years who clicked the ad, the youngest person was 19 and the oldest person was
+61 years.
+The mean income of the people who clicked the ad is 48614, the minimum income is 13996 and the highest income is  78521
+The average time spent on the website is 2 hours 25 minutes, the least time is 1 hour 44 minutes and the most time 
+spent by people who clicked the ad was 4 and a half hours.
+```{r echo=TRUE}
+range(clicked$Age)
+range(clicked$'Area Income')
+range(clicked$`Daily Time Spent on Site`)
+range(clicked$`Daily Internet Usage`)
+```
+```{r echo=TRUE}
+### the  standard deviation
+sd(clicked$Age)
+sd(clicked$'Area Income')
+sd(clicked$`Daily Time Spent on Site`)
+sd(clicked$`Daily Internet Usage`)
+```
+
+```{r echo=TRUE}
+## histogram for age
+hist(clicked$Age)
+```
+The age has a perfect distribution, 
+most of the people who clicked on the add are between 30 years 
+and 50 years.
+```{r echo=TRUE}
+### a histogram of income to show the distribution.
+hist(clicked$'Area Income')
+
+```
+The income of the people who clicked on the ad is between 40,000 and 60,000
+ 
+```{r echo=TRUE}
+## distribution of time spent on the site
+hist(clicked$`Daily Time Spent on Site`)
+```
+We can see most of the people spend 40-60 times in the website
+```{r echo=TRUE}
+### the distribution of daily time spent on the internet
+ hist(clicked$`Daily Internet Usage`)
+```
+The most of the people who click on the ad use 100-170 on internet
+
+
+    2. Bivariate analysis
+
+
+```{r echo=TRUE}
+### covvarience of age and income
+cov(clicked$Age,clicked$`Area Income`)
+```
+```{r echo=TRUE}
+### covvarience of age and daily time spent on site
+cov(clicked$Age,clicked$`Daily Internet Usage`)
+```
+```{r echo=TRUE}
+## calculating the correlation of the data.
+
+corr=clicked%>%
+  select(Age,"Daily Internet Usage",`Area Income`,"Clicked on Ad","Daily Time Spent on Site",Male)
+correlation=cor(corr)
+correlation
+```
+
+
+
+```{r echo=TRUE}
+plot(clicked$Age,clicked$`Daily Time Spent on Site`)
+```
+Same here, most of the people who spent time on the site are between 25
+years and 45 years
+```{r echo=TRUE}
+### the countries that clicked on the add
+country=table(clicked$Country)
+country_order=sort(country,decreasing = TRUE)
+head(country_order,15)
+```
+Austraria , Ethiopia  and Turkey had the highest number of number 
+of people who clicked on the Ad
+
+
+8. RECOMMENDATION
+
+From the insights we have mined
+I would recommend to advertise The course to people in 
+Australia, Ethiopia, turkey, Liberia, Liechtenstein and South Africa, those
+were the countries where most people clicked on the ad.
+People between the age of 25-45 years were more interested with the site
+ and hence spent alot of time on the site. I would suggest the adverts
+ to target the people in that age.
+It was also intersting to note that people with an income between
+40,000 and 65000 were very interested with the course, I would say they want
+to learn how to make more money hence it would be prudent to target them 
+when advertising the course.
